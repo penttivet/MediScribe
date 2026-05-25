@@ -1152,6 +1152,30 @@ def icon():
 def health():
     return jsonify({"status": "ok"})
 
+def ensure_admin():
+    try:
+        admin_email = os.environ.get("ADMIN_EMAIL", "admin@mediscribe.fi")
+        admin_hash = os.environ.get("ADMIN_PASSWORD_HASH", "b473debca72c06e903436ef305caa697ae7c50a03025e668a6a75eef96afe10f")
+        existing = redis_get(f"ms:user:{admin_email}")
+        if not existing:
+            redis_set(f"ms:user:{admin_email}", {
+                "name": "Admin", "email": admin_email,
+                "password": admin_hash, "clinic": "",
+                "status": "approved", "role": "admin",
+                "created": datetime.now().isoformat()
+            })
+            log.info(f"Admin created: {admin_email}")
+        elif existing.get("status") != "approved" or existing.get("password") != admin_hash:
+            existing["status"] = "approved"
+            existing["password"] = admin_hash
+            redis_set(f"ms:user:{admin_email}", existing)
+            log.info(f"Admin fixed: {admin_email}")
+    except Exception as e:
+        log.error(f"ensure_admin error: {e}")
+
+with app.app_context():
+    ensure_admin()
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=False)

@@ -557,9 +557,12 @@ HTML = """<!DOCTYPE html>
       <input type="text" id="patientName" placeholder="Potilaan nimi" />
       <input type="text" id="patientDob" placeholder="Syntymäaika (pp.kk.vvvv)" />
       <input type="text" id="doctorName" placeholder="Lääkärin nimi" />
-      <select id="language">
+      <select id="language" onchange="changeLanguage(this.value)">
         <option value="fi">🇫🇮 Suomi</option>
         <option value="en">🇬🇧 English</option>
+        <option value="sv">🇸🇪 Svenska</option>
+        <option value="de">🇩🇪 Deutsch</option>
+        <option value="ar">🇸🇦 العربية</option>
       </select>
     </div>
   </div>

@@ -794,10 +794,12 @@ ADMIN_HTML = """<!DOCTYPE html>
   .btn-approve {{ background:var(--success); color:#000; }}
   .btn-reject {{ background:var(--danger); color:#fff; margin-left:6px; }}
   .logout {{ float:right; padding:8px 16px; background:var(--surface2); border:1px solid var(--border); border-radius:8px; color:var(--text); text-decoration:none; font-size:13px; }}
+  .open-app {{ float:right; padding:8px 16px; background:linear-gradient(135deg,#4f8ef7,#7c6af7); border-radius:8px; color:white; text-decoration:none; font-size:13px; font-weight:600; margin-right:8px; }}
 </style>
 </head>
 <body>
 <a href="/logout" class="logout">Kirjaudu ulos</a>
+<a href="/app" class="open-app">🩺 Avaa sovellus</a>
 <h1>🩺 MediScribe Admin</h1>
 <div class="card">
   <h3 style="margin-bottom:16px;font-size:15px;color:#8b90a8;text-transform:uppercase;letter-spacing:1px;">Käyttäjät</h3>
@@ -932,6 +934,12 @@ def admin_reject():
 @app.route("/")
 @login_required
 def index():
+    return render_template_string(HTML)
+
+@app.route("/app")
+def app_direct():
+    if "user_email" not in session:
+        return redirect("/login")
     return render_template_string(HTML)
 
 @app.route("/meeting")

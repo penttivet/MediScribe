@@ -564,6 +564,13 @@ HTML = """<!DOCTYPE html>
         <option value="de">🇩🇪 Deutsch</option>
         <option value="ar">🇸🇦 العربية</option>
       </select>
+      <script>
+        // Set dropdown to saved language immediately
+        (function(){
+          var saved = localStorage.getItem('ms_lang') || 'fi';
+          document.currentScript.previousElementSibling.value = saved;
+        })();
+      </script>
     </div>
   </div>
 

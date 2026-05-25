@@ -191,10 +191,10 @@ MEETING_HTML = """<!DOCTYPE html>
   <div class="logo">🤝</div>
   <div class="header-text">
     <h1>Meeting</h1>
-    <p>Äänitä ja tiivistä</p>
+    <p>Record and summarize</p>
   </div>
   <div class="nav-links">
-    <a href="/" class="nav-link">🩺 Potilaskertomus</a>
+    <a href="/" class="nav-link">🩺 Medical record</a>
     <a href="/logout" class="nav-link">Sign out</a>
   </div>
 </div>
@@ -205,8 +205,8 @@ MEETING_HTML = """<!DOCTYPE html>
   <div class="card">
     <div class="card-title">Meetingn tiedot (valinnainen)</div>
     <div style="display:flex;flex-direction:column;gap:10px;">
-      <input type="text" id="meetingTitle" placeholder="Aihe / otsikko" />
-      <input type="text" id="participants" placeholder="Osallistujat (valinnainen)" />
+      <input type="text" id="meetingTitle" placeholder="Topic / title" />
+      <input type="text" id="participants" placeholder="Participants (optional)" />
     </div>
   </div>
 
@@ -235,7 +235,7 @@ MEETING_HTML = """<!DOCTYPE html>
     </div>
     <div class="progress-step" id="step2">
       <span class="step-icon">🧠</span>
-      <span>Luodaan tiivistelmä ja toimintapisteet</span>
+      <span>Creating summary and action items</span>
     </div>
   </div>
 
@@ -243,14 +243,14 @@ MEETING_HTML = """<!DOCTYPE html>
   <div class="result-section" id="resultSection">
     <div class="card">
       <div class="section-header">
-        <span class="tag">📝 Tiivistelmä</span>
+        <span class="tag">📝 Summary</span>
         <button class="copy-btn" onclick="copyText('summaryBox')">Kopioi</button>
       </div>
       <div class="summary-box" id="summaryBox"></div>
     </div>
     <div class="card">
       <div class="section-header">
-        <span class="tag">✅ Toimintapisteet</span>
+        <span class="tag">✅ Action items</span>
         <button class="copy-btn" onclick="copyText('actionBox')">Kopioi</button>
       </div>
       <div class="action-items" id="actionBox"></div>
@@ -262,12 +262,12 @@ MEETING_HTML = """<!DOCTYPE html>
       </div>
       <div class="transcript-box" id="transcriptBox"></div>
     </div>
-    <button class="btn btn-secondary" onclick="resetAll()">🔄 Uusi neuvottelu</button>
+    <button class="btn btn-secondary" onclick="resetAll()">🔄 New meeting</button>
   </div>
 
   <!-- Generate button -->
   <button class="btn btn-primary" id="generateBtn" onclick="generate()" disabled>
-    ✨ Luo tiivistelmä
+    ✨ Create summary
   </button>
 
 </div>
@@ -304,12 +304,12 @@ async function toggleRecording() {
       timerInterval = setInterval(updateTimer, 1000);
       document.getElementById('recordBtn').classList.add('recording');
       document.getElementById('recordBtn').textContent = '⏹️';
-      document.getElementById('recordStatus').textContent = 'Äänitetään...';
+      document.getElementById('recordStatus').textContent = 'Recording...';
       document.getElementById('recordStatus').classList.add('active');
       document.getElementById('timer').classList.add('visible');
       document.getElementById('wave').classList.add('visible');
     } catch(e) {
-      showError('Mikrofoni ei ole käytettävissä. Tarkista selaimen luvat.');
+      showError('Microphone not available. Check browser permissions.');
     }
   } else {
     mediaRecorder.stop();
@@ -452,7 +452,7 @@ Luo seuraava JSON-rakenne:
   ]
 }
 
-Toimintapisteet ovat konkreettisia tehtäviä joita sovittiin tehtäväksi. Jos ei ole selkeitä toimintapisteitä, palauta tyhjä lista [].
+Action items ovat konkreettisia tehtäviä joita sovittiin tehtäväksi. Jos ei ole selkeitä toimintapisteitä, palauta tyhjä lista [].
 
 Vastaa VAIN JSON-objektilla ilman muuta tekstiä tai markdown-merkkejä."""
 
@@ -646,12 +646,12 @@ async function toggleRecording() {
       timerInterval = setInterval(updateTimer, 1000);
       document.getElementById('recordBtn').classList.add('recording');
       document.getElementById('recordBtn').textContent = '⏹️';
-      document.getElementById('recordStatus').textContent = 'Äänitetään...';
+      document.getElementById('recordStatus').textContent = 'Recording...';
       document.getElementById('recordStatus').classList.add('active');
       document.getElementById('timer').classList.add('visible');
       document.getElementById('wave').classList.add('visible');
     } catch(e) {
-      showError('Mikrofoni ei ole käytettävissä. Tarkista selaimen luvat.');
+      showError('Microphone not available. Check browser permissions.');
     }
   } else {
     mediaRecorder.stop();
@@ -1073,7 +1073,7 @@ def meeting_summarize():
         })
     except Exception as e:
         log.error(f"Meeting summarize error: {e}")
-        return jsonify({"error": "Tiivistelmän luonti epäonnistui"}), 500
+        return jsonify({"error": "Summaryn luonti epäonnistui"}), 500
 
 @app.route("/transcribe", methods=["POST"])
 @login_required

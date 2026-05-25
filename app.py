@@ -41,35 +41,25 @@ REDIS_HEADERS = {
 
 
  def send_email_notification(name, email, clinic):
+    try:
+        resend_api_key = os.environ.get("RESEND_API_KEY", "")
         admin_email = os.environ.get("ADMIN_EMAIL", "")
-        if not gmail_user or not gmail_password or not admin_email:
-            log.warning("Gmail credentials missing, skipping email")
+        if not resend_api_key or not admin_email:
+            log.warning("Resend credentials missing, skipping email")
             return
-        msg = MIMEMultipart("alternative")
-        msg["Subject"] = f"MediScribe: Uusi rekisteröityminen – {name}"
-        msg["From"] = gmail_user
-        msg["To"] = admin_email
-        body = f"""
-Hei!
-
-Uusi käyttäjä on rekisteröitynyt MediScribeen ja odottaa hyväksyntää.
-
-Nimi: {name}
-Sähköposti: {email}
-Klinikka: {clinic or "Ei ilmoitettu"}
-Aika: {datetime.now().strftime("%d.%m.%Y %H:%M")}
-
-Hyväksy tai hylkää käyttäjä admin-paneelissa:
-https://mediscribe-production.up.railway.app/admin
-
-Terveisin,
-MediScribe
-"""
-        msg.attach(MIMEText(body, "plain", "utf-8"))
-        with smtplib.SMTP("smtp.gmail.com", 587) as server:
-            server.starttls()
-            server.login(gmail_user, gmail_password)
-            server.sendmail(gmail_user, admin_email, msg.as_string())
+        requests.post(
+            "https://api.resend.com/emails",
+            headers={
+                "Authorization": f"Bearer {resend_api_key}",
+                "Content-Type": "application/json"
+            },
+            json={
+                "from": "MediScribe <onboarding@resend.dev>",
+                "to": admin_email,
+                "subject": f"MediScribe: New registration - {name}",
+                "text": f"Hello!\n\nA new user has registered to MediScribe and is waiting for approval.\n\nName: {name}\nEmail: {email}\nClinic: {clinic or 'Not specified'}\n\nApprove or reject the user in the admin panel:\nhttps://mediscribe-production.up.railway.app/admin\n\nBest regards,\nMediScribe"
+            }
+        )
         log.info(f"Email notification sent for {email}")
     except Exception as e:
         log.error(f"Email error: {e}")

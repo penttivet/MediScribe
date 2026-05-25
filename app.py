@@ -40,7 +40,7 @@ REDIS_HEADERS = {
 }
 
 
-ddef send_email_notification(name, email, clinic):
+ def send_email_notification(name, email, clinic):
         admin_email = os.environ.get("ADMIN_EMAIL", "")
         if not gmail_user or not gmail_password or not admin_email:
             log.warning("Gmail credentials missing, skipping email")

@@ -70,7 +70,8 @@ Terveisin,
 MediScribe
 """
         msg.attach(MIMEText(body, "plain", "utf-8"))
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+        with smtplib.SMTP("smtp.gmail.com", 587) as server:
+            server.starttls()
             server.login(gmail_user, gmail_password)
             server.sendmail(gmail_user, admin_email, msg.as_string())
         log.info(f"Email notification sent for {email}")

@@ -15,6 +15,12 @@ from reportlab.lib.enums import TA_LEFT, TA_CENTER
 
 import hashlib
 import secrets
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from functools import wraps
 from flask import session, redirect, url_for
 
@@ -32,6 +38,44 @@ REDIS_HEADERS = {
     "Authorization": f"Bearer {UPSTASH_TOKEN}",
     "Content-Type": "application/json"
 }
+
+
+def send_email_notification(name, email, clinic):
+    """Lähettää sähköposti-ilmoituksen adminille uudesta rekisteröitymisestä."""
+    try:
+        gmail_user = os.environ.get("GMAIL_USER", "")
+        gmail_password = os.environ.get("GMAIL_PASSWORD", "")
+        admin_email = os.environ.get("ADMIN_EMAIL", "")
+        if not gmail_user or not gmail_password or not admin_email:
+            log.warning("Gmail credentials missing, skipping email")
+            return
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = f"MediScribe: Uusi rekisteröityminen - {name}"
+        msg["From"] = gmail_user
+        msg["To"] = admin_email
+        body = f"""
+Hei!
+
+Uusi käyttäjä on rekisteröitynyt MediScribeen ja odottaa hyväksyntää.
+
+Nimi: {name}
+Sähköposti: {email}
+Klinikka: {clinic or "Ei ilmoitettu"}
+Aika: {datetime.now().strftime("%d.%m.%Y %H:%M")}
+
+Hyväksy tai hylkää käyttäjä admin-paneelissa:
+https://mediscribe-production.up.railway.app/admin
+
+Terveisin,
+MediScribe
+"""
+        msg.attach(MIMEText(body, "plain", "utf-8"))
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+            server.login(gmail_user, gmail_password)
+            server.sendmail(gmail_user, admin_email, msg.as_string())
+        log.info(f"Email notification sent for {email}")
+    except Exception as e:
+        log.error(f"Email error: {e}")
 
 def redis_get(key):
     try:
@@ -867,7 +911,19 @@ def register():
                 "clinic": clinic, "status": "pending",
                 "created": datetime.now().isoformat()
             })
+            send_email_notification(name, email, clinic)
             msg = '<div class="msg success">✅ Rekisteröityminen onnistui! Saat ilmoituksen kun tilisi on hyväksytty.</div>'
+            # Lähetä ilmoitus adminille
+            admin_email = os.environ.get("ADMIN_EMAIL", "admin@mediscribe.fi")
+            send_email(
+                admin_email,
+                f"MediScribe: Uusi käyttäjä odottaa hyväksyntää",
+                f"""<h2>Uusi käyttäjä rekisteröitynyt</h2>
+                <p><b>Nimi:</b> {name}</p>
+                <p><b>Sähköposti:</b> {email}</p>
+                <p><b>Klinikka:</b> {clinic or 'Ei ilmoitettu'}</p>
+                <p><a href="https://mediscribe-production.up.railway.app/admin">Hyväksy käyttäjä admin-paneelissa</a></p>"""
+            )
     form = '''<form method="POST">
       <div class="field"><label>Nimi</label><input type="text" name="name" required></div>
       <div class="field"><label>Sähköposti</label><input type="email" name="email" required></div>
@@ -1151,6 +1207,27 @@ def icon():
 @app.route("/health")
 def health():
     return jsonify({"status": "ok"})
+
+
+def send_email(to, subject, body):
+    """Lähettää sähköpostin Gmail SMTP:llä."""
+    gmail_user = os.environ.get("GMAIL_USER", "")
+    gmail_password = os.environ.get("GMAIL_PASSWORD", "")
+    if not gmail_user or not gmail_password:
+        log.warning("Gmail credentials not set, skipping email")
+        return
+    try:
+        msg = MIMEMultipart()
+        msg['From'] = gmail_user
+        msg['To'] = to
+        msg['Subject'] = subject
+        msg.attach(MIMEText(body, 'html'))
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
+            server.login(gmail_user, gmail_password)
+            server.send_message(msg)
+        log.info(f"Email sent to {to}")
+    except Exception as e:
+        log.error(f"Email error: {e}")
 
 def ensure_admin():
     try:

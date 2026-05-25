@@ -113,7 +113,7 @@ MEETING_HTML = """<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>MediScribe – Neuvottelu</title>
+<title>MediScribe – Meeting</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0f1117">
@@ -190,12 +190,12 @@ MEETING_HTML = """<!DOCTYPE html>
 <div class="header">
   <div class="logo">🤝</div>
   <div class="header-text">
-    <h1>Neuvottelu</h1>
+    <h1>Meeting</h1>
     <p>Äänitä ja tiivistä</p>
   </div>
   <div class="nav-links">
     <a href="/" class="nav-link">🩺 Potilaskertomus</a>
-    <a href="/logout" class="nav-link">Ulos</a>
+    <a href="/logout" class="nav-link">Sign out</a>
   </div>
 </div>
 
@@ -203,7 +203,7 @@ MEETING_HTML = """<!DOCTYPE html>
 
   <!-- Meeting info -->
   <div class="card">
-    <div class="card-title">Neuvottelun tiedot (valinnainen)</div>
+    <div class="card-title">Meetingn tiedot (valinnainen)</div>
     <div style="display:flex;flex-direction:column;gap:10px;">
       <input type="text" id="meetingTitle" placeholder="Aihe / otsikko" />
       <input type="text" id="participants" placeholder="Osallistujat (valinnainen)" />
@@ -212,14 +212,14 @@ MEETING_HTML = """<!DOCTYPE html>
 
   <!-- Recording -->
   <div class="card">
-    <div class="card-title" id="labelRecording">Äänitys</div>
+    <div class="card-title" id="labelRecording">Recording</div>
     <div class="record-section">
       <div class="timer" id="timer">00:00</div>
       <button class="record-btn" id="recordBtn" onclick="toggleRecording()">🎙️</button>
       <div class="wave" id="wave">
         <span></span><span></span><span></span><span></span><span></span>
       </div>
-      <div class="record-status" id="recordStatus">Paina nappia aloittaaksesi äänitys</div>
+      <div class="record-status" id="recordStatus">Press button to start recording</div>
     </div>
   </div>
 
@@ -228,10 +228,10 @@ MEETING_HTML = """<!DOCTYPE html>
 
   <!-- Processing -->
   <div class="card progress-section" id="progressSection">
-    <div class="card-title">Käsitellään...</div>
+    <div class="card-title">Processing...</div>
     <div class="progress-step" id="step1">
       <span class="step-icon">🎙️</span>
-      <span>Tunnistetaan puhe tekstiksi</span>
+      <span>Converting speech to text</span>
     </div>
     <div class="progress-step" id="step2">
       <span class="step-icon">🧠</span>
@@ -257,7 +257,7 @@ MEETING_HTML = """<!DOCTYPE html>
     </div>
     <div class="card">
       <div class="section-header">
-        <span class="tag">🎙️ Transkriptio</span>
+        <span class="tag">🎙️ Transcript</span>
         <button class="copy-btn" onclick="copyText('transcriptBox')">Kopioi</button>
       </div>
       <div class="transcript-box" id="transcriptBox"></div>
@@ -318,7 +318,7 @@ async function toggleRecording() {
     clearInterval(timerInterval);
     document.getElementById('recordBtn').classList.remove('recording');
     document.getElementById('recordBtn').textContent = '🎙️';
-    document.getElementById('recordStatus').textContent = 'Äänitys valmis (' + document.getElementById('timer').textContent + ')';
+    document.getElementById('recordStatus').textContent = 'Recording valmis (' + document.getElementById('timer').textContent + ')';
     document.getElementById('recordStatus').classList.remove('active');
     document.getElementById('wave').classList.remove('visible');
   }
@@ -417,7 +417,7 @@ function resetAll() {
   seconds = 0;
   document.getElementById('timer').textContent = '00:00';
   document.getElementById('timer').classList.remove('visible');
-  document.getElementById('recordStatus').textContent = 'Paina nappia aloittaaksesi äänitys';
+  document.getElementById('recordStatus').textContent = 'Press button to start recording';
   document.getElementById('recordStatus').classList.remove('active');
   document.getElementById('generateBtn').disabled = true;
   document.getElementById('generateBtn').style.display = 'flex';
@@ -540,11 +540,11 @@ HTML = """<!DOCTYPE html>
   <div class="logo">🩺</div>
   <div class="header-text">
     <h1>MediScribe</h1>
-    <p>Automaattinen potilaskertomus</p>
+    <p>Automatic medical record</p>
   </div>
   <div class="nav-links">
-    <a href="/meeting" class="nav-link">🤝 Neuvottelu</a>
-    <a href="/logout" class="nav-link">Ulos</a>
+    <a href="/meeting" class="nav-link">🤝 Meeting</a>
+    <a href="/logout" class="nav-link">Sign out</a>
   </div>
 </div>
 
@@ -552,14 +552,14 @@ HTML = """<!DOCTYPE html>
 
   <!-- Patient info -->
   <div class="card">
-    <div class="card-title" id="labelPatientInfo">Potilaan tiedot</div>
+    <div class="card-title" id="labelPatientInfo">Patient Information</div>
     <div class="input-group">
-      <input type="text" id="patientName" placeholder="Potilaan nimi" />
-      <input type="text" id="patientDob" placeholder="Syntymäaika (pp.kk.vvvv)" />
-      <input type="text" id="doctorName" placeholder="Lääkärin nimi" />
+      <input type="text" id="patientName" placeholder="Patient name" />
+      <input type="text" id="patientDob" placeholder="Date of birth (dd.mm.yyyy)" />
+      <input type="text" id="doctorName" placeholder="Doctor name" />
       <select id="language" onchange="changeLanguage(this.value)">
-        <option value="fi">🇫🇮 Suomi</option>
         <option value="en">🇬🇧 English</option>
+        <option value="fi">🇫🇮 Suomi</option>
         <option value="sv">🇸🇪 Svenska</option>
         <option value="de">🇩🇪 Deutsch</option>
         <option value="ar">🇸🇦 العربية</option>
@@ -576,14 +576,14 @@ HTML = """<!DOCTYPE html>
 
   <!-- Recording -->
   <div class="card">
-    <div class="card-title" id="labelRecording">Äänitys</div>
+    <div class="card-title" id="labelRecording">Recording</div>
     <div class="record-section">
       <div class="timer" id="timer">00:00</div>
       <button class="record-btn" id="recordBtn" onclick="toggleRecording()">🎙️</button>
       <div class="wave" id="wave">
         <span></span><span></span><span></span><span></span><span></span>
       </div>
-      <div class="record-status" id="recordStatus">Paina nappia aloittaaksesi äänitys</div>
+      <div class="record-status" id="recordStatus">Press button to start recording</div>
     </div>
   </div>
 
@@ -592,24 +592,24 @@ HTML = """<!DOCTYPE html>
 
   <!-- Processing -->
   <div class="card progress-section" id="progressSection">
-    <div class="card-title" id="labelProcessing">Käsitellään...</div>
-    <div class="progress-step" id="step1"><span class="step-icon">🎙️</span><span id="labelStep1">Tunnistetaan puhe tekstiksi</span></div>
-    <div class="progress-step" id="step2"><span class="step-icon">🧠</span><span id="labelStep2">Luodaan potilaskertomus</span></div>
-    <div class="progress-step" id="step3"><span class="step-icon">📄</span><span id="labelStep3">Generoidaan PDF</span></div>
+    <div class="card-title" id="labelProcessing">Processing...</div>
+    <div class="progress-step" id="step1"><span class="step-icon">🎙️</span><span id="labelStep1">Converting speech to text</span></div>
+    <div class="progress-step" id="step2"><span class="step-icon">🧠</span><span id="labelStep2">Creating medical record</span></div>
+    <div class="progress-step" id="step3"><span class="step-icon">📄</span><span id="labelStep3">Generating PDF</span></div>
   </div>
 
   <!-- Result -->
   <div class="result-section" id="resultSection">
     <div class="card">
-      <div class="card-title" id="labelTranscript">Transkriptio</div>
+      <div class="card-title" id="labelTranscript">Transcript</div>
       <div class="transcript-box" id="transcriptBox"></div>
     </div>
-    <button class="btn download-btn" id="downloadBtn" onclick="downloadPDF()">📥 Lataa potilaskertomus PDF</button>
-    <button class="btn btn-secondary" id="newRecordingBtn" onclick="reset()">🔄 Uusi tallennus</button>
+    <button class="btn download-btn" id="downloadBtn" onclick="downloadPDF()">📥 Download medical record PDF</button>
+    <button class="btn btn-secondary" id="newRecordingBtn" onclick="reset()">🔄 New recording</button>
   </div>
 
   <!-- Generate button -->
-  <button class="btn btn-primary" id="generateBtn" onclick="generate()" disabled>✨ Luo potilaskertomus</button>
+  <button class="btn btn-primary" id="generateBtn" onclick="generate()" disabled>✨ Create medical record</button>
 
 </div>
 
@@ -660,7 +660,7 @@ async function toggleRecording() {
     clearInterval(timerInterval);
     document.getElementById('recordBtn').classList.remove('recording');
     document.getElementById('recordBtn').textContent = '🎙️';
-    document.getElementById('recordStatus').textContent = 'Äänitys valmis (' + document.getElementById('timer').textContent + ')';
+    document.getElementById('recordStatus').textContent = 'Recording valmis (' + document.getElementById('timer').textContent + ')';
     document.getElementById('recordStatus').classList.remove('active');
     document.getElementById('wave').classList.remove('visible');
   }
@@ -741,7 +741,7 @@ function reset() {
   audioBlob = null; pdfData = null; seconds = 0;
   document.getElementById('timer').textContent = '00:00';
   document.getElementById('timer').classList.remove('visible');
-  document.getElementById('recordStatus').textContent = 'Paina nappia aloittaaksesi äänitys';
+  document.getElementById('recordStatus').textContent = 'Press button to start recording';
   document.getElementById('recordStatus').classList.remove('active');
   document.getElementById('generateBtn').disabled = true;
   document.getElementById('generateBtn').style.display = 'flex';
@@ -1046,7 +1046,7 @@ def meeting_summarize():
 
     context = ""
     if meeting_title:
-        context += f"Neuvottelun aihe: {meeting_title}\n"
+        context += f"Meetingn aihe: {meeting_title}\n"
     if participants:
         context += f"Osallistujat: {participants}\n"
     if context:
@@ -1060,7 +1060,7 @@ def meeting_summarize():
                 "model": "claude-sonnet-4-20250514",
                 "max_tokens": 1000,
                 "system": MEETING_SUMMARY_SYSTEM,
-                "messages": [{"role": "user", "content": f"{context}Transkriptio:\n\n{transcript}"}]
+                "messages": [{"role": "user", "content": f"{context}Transcript:\n\n{transcript}"}]
             },
             timeout=30
         )
@@ -1116,7 +1116,7 @@ def generate_pdf():
                 "model": "claude-sonnet-4-20250514",
                 "max_tokens": 1500,
                 "system": system,
-                "messages": [{"role": "user", "content": f"Transkriptio:\n\n{transcript}"}]
+                "messages": [{"role": "user", "content": f"Transcript:\n\n{transcript}"}]
             },
             timeout=30
         )
@@ -1199,7 +1199,7 @@ def generate_pdf():
 def manifest():
     return jsonify({
         "name": "MediScribe", "short_name": "MediScribe",
-        "description": "Automaattinen potilaskertomus",
+        "description": "Automatic medical record",
         "start_url": "/", "display": "standalone",
         "background_color": "#0f1117", "theme_color": "#0f1117",
         "orientation": "portrait",

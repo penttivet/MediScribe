@@ -40,17 +40,13 @@ REDIS_HEADERS = {
 }
 
 
-def send_email_notification(name, email, clinic):
-    """Lähettää sähköposti-ilmoituksen adminille uudesta rekisteröitymisestä."""
-    try:
-        gmail_user = os.environ.get("GMAIL_USER", "")
-        gmail_password = os.environ.get("GMAIL_PASSWORD", "")
+ddef send_email_notification(name, email, clinic):
         admin_email = os.environ.get("ADMIN_EMAIL", "")
         if not gmail_user or not gmail_password or not admin_email:
             log.warning("Gmail credentials missing, skipping email")
             return
         msg = MIMEMultipart("alternative")
-        msg["Subject"] = f"MediScribe: Uusi rekisteröityminen - {name}"
+        msg["Subject"] = f"MediScribe: Uusi rekisteröityminen – {name}"
         msg["From"] = gmail_user
         msg["To"] = admin_email
         body = f"""

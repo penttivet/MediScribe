@@ -212,7 +212,7 @@ MEETING_HTML = """<!DOCTYPE html>
 
   <!-- Recording -->
   <div class="card">
-    <div class="card-title">Äänitys</div>
+    <div class="card-title" id="labelRecording">Äänitys</div>
     <div class="record-section">
       <div class="timer" id="timer">00:00</div>
       <button class="record-btn" id="recordBtn" onclick="toggleRecording()">🎙️</button>
@@ -552,7 +552,7 @@ HTML = """<!DOCTYPE html>
 
   <!-- Patient info -->
   <div class="card">
-    <div class="card-title">Potilaan tiedot</div>
+    <div class="card-title" id="labelPatientInfo">Potilaan tiedot</div>
     <div class="input-group">
       <input type="text" id="patientName" placeholder="Potilaan nimi" />
       <input type="text" id="patientDob" placeholder="Syntymäaika (pp.kk.vvvv)" />
@@ -569,7 +569,7 @@ HTML = """<!DOCTYPE html>
 
   <!-- Recording -->
   <div class="card">
-    <div class="card-title">Äänitys</div>
+    <div class="card-title" id="labelRecording">Äänitys</div>
     <div class="record-section">
       <div class="timer" id="timer">00:00</div>
       <button class="record-btn" id="recordBtn" onclick="toggleRecording()">🎙️</button>
@@ -585,20 +585,20 @@ HTML = """<!DOCTYPE html>
 
   <!-- Processing -->
   <div class="card progress-section" id="progressSection">
-    <div class="card-title">Käsitellään...</div>
-    <div class="progress-step" id="step1"><span class="step-icon">🎙️</span><span>Tunnistetaan puhe tekstiksi</span></div>
-    <div class="progress-step" id="step2"><span class="step-icon">🧠</span><span>Luodaan potilaskertomus</span></div>
-    <div class="progress-step" id="step3"><span class="step-icon">📄</span><span>Generoidaan PDF</span></div>
+    <div class="card-title" id="labelProcessing">Käsitellään...</div>
+    <div class="progress-step" id="step1"><span class="step-icon">🎙️</span><span id="labelStep1">Tunnistetaan puhe tekstiksi</span></div>
+    <div class="progress-step" id="step2"><span class="step-icon">🧠</span><span id="labelStep2">Luodaan potilaskertomus</span></div>
+    <div class="progress-step" id="step3"><span class="step-icon">📄</span><span id="labelStep3">Generoidaan PDF</span></div>
   </div>
 
   <!-- Result -->
   <div class="result-section" id="resultSection">
     <div class="card">
-      <div class="card-title">Transkriptio</div>
+      <div class="card-title" id="labelTranscript">Transkriptio</div>
       <div class="transcript-box" id="transcriptBox"></div>
     </div>
     <button class="btn download-btn" id="downloadBtn" onclick="downloadPDF()">📥 Lataa potilaskertomus PDF</button>
-    <button class="btn btn-secondary" onclick="reset()">🔄 Uusi tallennus</button>
+    <button class="btn btn-secondary" id="newRecordingBtn" onclick="reset()">🔄 Uusi tallennus</button>
   </div>
 
   <!-- Generate button -->

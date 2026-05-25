@@ -37,10 +37,7 @@ UPSTASH_TOKEN     = os.environ.get("UPSTASH_REDIS_REST_TOKEN", "")
 REDIS_HEADERS = {
     "Authorization": f"Bearer {UPSTASH_TOKEN}",
     "Content-Type": "application/json"
-}
-
-
- def send_email_notification(name, email, clinic):
+def send_email_notification(name, email, clinic):
     try:
         resend_api_key = os.environ.get("RESEND_API_KEY", "")
         admin_email = os.environ.get("ADMIN_EMAIL", "")

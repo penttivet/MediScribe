@@ -203,7 +203,7 @@ MEETING_HTML = """<!DOCTYPE html>
 
   <!-- Meeting info -->
   <div class="card">
-    <div class="card-title">Meetingn tiedot (valinnainen)</div>
+    <div class="card-title">Meeting details (optional)</div>
     <div style="display:flex;flex-direction:column;gap:10px;">
       <input type="text" id="meetingTitle" placeholder="Topic / title" />
       <input type="text" id="participants" placeholder="Participants (optional)" />

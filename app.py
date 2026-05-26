@@ -213,7 +213,7 @@ MEETING_HTML = """<!DOCTYPE html>
     <div class="card-title" id="labelRecording">Recording</div>
     <div class="record-section">
       <div class="timer" id="timer">00:00</div>
-      <button class="record-btn" id="recordBtn" onclick="toggleRecording()">🎙️</button>
+      <button class="record-btn" id="recordBtn" onclick="handleRecordBtn()">🎙️</button>
       <div class="wave" id="wave"><span></span><span></span><span></span><span></span><span></span></div>
       <div class="record-status" id="recordStatus">Press button to start recording</div>
     </div>
@@ -243,6 +243,7 @@ MEETING_HTML = """<!DOCTYPE html>
 </div>
 <script>
 let mediaRecorder = null, audioChunks = [], isRecording = false, timerInterval = null, seconds = 0, audioBlob = null;
+function handleRecordBtn() { toggleRecording().catch(e => showError("Microphone error: " + e.name + " - " + e.message)); }
 function updateTimer() { seconds++; const m = String(Math.floor(seconds/60)).padStart(2,'0'); const s = String(seconds%60).padStart(2,'0'); document.getElementById('timer').textContent = m+':'+s; }
 async function toggleRecording() {
   if (!isRecording) {

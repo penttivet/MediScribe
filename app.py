@@ -200,6 +200,13 @@ MEETING_HTML = """<!DOCTYPE html>
     <div style="display:flex;flex-direction:column;gap:10px;">
       <input type="text" id="meetingTitle" placeholder="Topic / title" />
       <input type="text" id="participants" placeholder="Participants (optional)" />
+      <select id="meetingLanguage" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:13px 16px;color:var(--text);font-family:DM Sans,sans-serif;font-size:15px;width:100%;outline:none;">
+        <option value="en">🇬🇧 English</option>
+        <option value="fi">🇫🇮 Suomi</option>
+        <option value="sv">🇸🇪 Svenska</option>
+        <option value="de">🇩🇪 Deutsch</option>
+        <option value="ar">🇸🇦 العربية</option>
+      </select>
     </div>
   </div>
   <div class="card">
@@ -248,7 +255,7 @@ async function toggleRecording() {
       document.getElementById('recordBtn').classList.add('recording'); document.getElementById('recordBtn').textContent = '⏹️';
       document.getElementById('recordStatus').textContent = 'Recording...'; document.getElementById('recordStatus').classList.add('active');
       document.getElementById('timer').classList.add('visible'); document.getElementById('wave').classList.add('visible');
-    } catch(e) { showError('Microphone not available. Check browser permissions.'); }
+    } catch(e) { showError('Microphone error: ' + e.name + ' - ' + e.message); }
   } else {
     mediaRecorder.stop(); mediaRecorder.stream.getTracks().forEach(t=>t.stop()); isRecording = false; clearInterval(timerInterval);
     document.getElementById('recordBtn').classList.remove('recording'); document.getElementById('recordBtn').textContent = '🎙️';
@@ -261,11 +268,11 @@ async function generate() {
   if (!audioBlob) return; hideError();
   document.getElementById('generateBtn').style.display='none'; document.getElementById('progressSection').classList.add('visible'); document.getElementById('resultSection').classList.remove('visible');
   setStep(1,'active'); setStep(2,'');
-  const formData = new FormData(); formData.append('audio',audioBlob,'recording.webm'); formData.append('meeting_title',document.getElementById('meetingTitle').value); formData.append('participants',document.getElementById('participants').value);
+  const formData = new FormData(); formData.append('audio',audioBlob,'recording.webm'); formData.append('meeting_title',document.getElementById('meetingTitle').value); formData.append('participants',document.getElementById('participants').value); formData.append('language',document.getElementById('meetingLanguage').value);
   try {
     const resp = await fetch('/meeting/transcribe',{method:'POST',body:formData}); const data = await resp.json(); if(!resp.ok) throw new Error(data.error||'Transcription failed');
     setStep(1,'done'); setStep(2,'active'); document.getElementById('transcriptBox').textContent = data.transcript;
-    const resp2 = await fetch('/meeting/summarize',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({transcript:data.transcript,meeting_title:document.getElementById('meetingTitle').value,participants:document.getElementById('participants').value})});
+    const resp2 = await fetch('/meeting/summarize',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({transcript:data.transcript,meeting_title:document.getElementById('meetingTitle').value,participants:document.getElementById('participants').value,language:document.getElementById('meetingLanguage').value})});
     const data2 = await resp2.json(); if(!resp2.ok) throw new Error(data2.error||'Summary failed');
     setStep(2,'done'); document.getElementById('summaryBox').textContent = data2.summary;
     const actionBox = document.getElementById('actionBox'); actionBox.innerHTML='';

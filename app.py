@@ -229,6 +229,7 @@ HTML = """<!DOCTYPE html>
     </div>
     <button class="btn download-btn" id="downloadBtn" onclick="downloadPDF()">📥 Download medical record PDF</button>
     <button class="btn btn-secondary" onclick="reset()">🔄 New recording</button>
+    <button class="btn" style="background:rgba(247,79,106,0.15);color:var(--danger);border:1px solid rgba(247,79,106,0.3);" onclick="deleteTranscript()">🗑️ Delete & start over</button>
   </div>
   <button class="btn btn-primary" id="generateBtn" onclick="generate()" disabled>✨ Create medical record</button>
 </div>
@@ -270,6 +271,9 @@ async function generate(){
   }catch(e){document.getElementById('progressSection').classList.remove('visible');document.getElementById('generateBtn').style.display='flex';showError(e.message);}
 }
 function downloadPDF(){if(!pdfData)return;const a=document.createElement('a');a.href=pdfData;const name=document.getElementById('patientName').value||'patient';const date=new Date().toISOString().split('T')[0];a.download='medical_record_'+name+'_'+date+'.pdf';a.click();}
+function deleteTranscript(){
+  if(confirm('Delete this recording and transcript?')){reset();}
+}
 function reset(){audioBlob=null;pdfData=null;seconds=0;document.getElementById('timer').textContent='00:00';document.getElementById('timer').classList.remove('visible');document.getElementById('recordStatus').textContent='Press button to start recording';document.getElementById('recordStatus').classList.remove('active');document.getElementById('generateBtn').disabled=true;document.getElementById('generateBtn').style.display='flex';document.getElementById('resultSection').classList.remove('visible');document.getElementById('progressSection').classList.remove('visible');hideError();}
 function showError(msg){const el=document.getElementById('errorMsg');el.textContent='⚠️ '+msg;el.classList.add('visible');}
 function hideError(){document.getElementById('errorMsg').classList.remove('visible');}

@@ -243,7 +243,7 @@ MEETING_HTML = """<!DOCTYPE html>
 </div>
 <script>
 let mediaRecorder = null, audioChunks = [], isRecording = false, timerInterval = null, seconds = 0, audioBlob = null;
-function handleRecordBtn() { toggleRecording().catch(e => showError("Microphone error: " + e.name + " - " + e.message)); }
+function handleRecordBtn() { alert("Button pressed! isRecording=" + isRecording); toggleRecording().catch(e => showError("Microphone error: " + e.name + " - " + e.message)); }
 function updateTimer() { seconds++; const m = String(Math.floor(seconds/60)).padStart(2,'0'); const s = String(seconds%60).padStart(2,'0'); document.getElementById('timer').textContent = m+':'+s; }
 async function toggleRecording() {
   if (!isRecording) {

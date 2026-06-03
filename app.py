@@ -170,7 +170,9 @@ HTML = """<!DOCTYPE html>
   @keyframes spin { to{transform:rotate(360deg);} }
   .result-section { display:none; }
   .result-section.visible { display:flex; flex-direction:column; gap:12px; }
-  .transcript-box { background:var(--surface2); border-radius:10px; padding:14px; font-size:13px; line-height:1.6; color:var(--text2); max-height:120px; overflow-y:auto; border:1px solid var(--border); }
+  .transcript-box { background:var(--surface2); border-radius:10px; padding:14px; font-size:13px; line-height:1.6; color:var(--text); min-height:80px; max-height:200px; overflow-y:auto; border:1px solid var(--accent); cursor:text; outline:none; }
+  .transcript-box:focus { border-color:var(--accent2); }
+  .edit-hint { font-size:11px; color:var(--accent); font-weight:400; text-transform:none; letter-spacing:0; margin-left:6px; }
   .download-btn { background:linear-gradient(135deg,var(--success),#3ab868); color:white; box-shadow:0 6px 24px rgba(79,202,122,0.3); }
   .error-msg { background:rgba(247,79,106,0.12); border:1px solid rgba(247,79,106,0.3); border-radius:10px; padding:12px 14px; font-size:13px; color:var(--danger); display:none; }
   .error-msg.visible { display:block; }
@@ -224,8 +226,8 @@ HTML = """<!DOCTYPE html>
   </div>
   <div class="result-section" id="resultSection">
     <div class="card">
-      <div class="card-title">Transcript</div>
-      <div class="transcript-box" id="transcriptBox" contenteditable="true" spellcheck="false" style="cursor:text:min-height:80px;"></div
+      <div class="card-title">Transcript <span class="edit-hint">✏️ editable</span></div>
+      <div class="transcript-box" id="transcriptBox" contenteditable="true" spellcheck="false"></div>
     </div>
     <button class="btn download-btn" id="downloadBtn" onclick="downloadPDF()">📥 Download medical record PDF</button>
     <button class="btn btn-secondary" onclick="reset()">🔄 New recording</button>
@@ -264,17 +266,27 @@ async function generate(){
   try{
     const resp=await fetch('/transcribe',{method:'POST',body:formData});const data=await resp.json();if(!resp.ok)throw new Error(data.error||'Transcription failed');
     setStep(1,'done');setStep(2,'active');document.getElementById('transcriptBox').textContent=data.transcript;
-    const resp2=await fetch('/generate_pdf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({transcript:document.getElementById('transcriptBox').innerText||data.transcript,:data.transcript,patient_name:document.getElementById('patientName').value,patient_dob:document.getElementById('patientDob').value,doctor_name:document.getElementById('doctorName').value,language:document.getElementById('language').value})});
+    const editedTranscript=document.getElementById('transcriptBox').innerText||data.transcript;
+    const resp2=await fetch('/generate_pdf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({transcript:editedTranscript,patient_name:document.getElementById('patientName').value,patient_dob:document.getElementById('patientDob').value,doctor_name:document.getElementById('doctorName').value,language:document.getElementById('language').value})});
     if(!resp2.ok){const err=await resp2.json();throw new Error(err.error||'PDF generation failed');}
     setStep(2,'done');setStep(3,'active');const blob=await resp2.blob();pdfData=URL.createObjectURL(blob);setStep(3,'done');
     setTimeout(()=>{document.getElementById('progressSection').classList.remove('visible');document.getElementById('resultSection').classList.add('visible');},600);
   }catch(e){document.getElementById('progressSection').classList.remove('visible');document.getElementById('generateBtn').style.display='flex';showError(e.message);}
 }
-function downloadPDF(){if(!pdfData)return;const a=document.createElement('a');a.href=pdfData;const name=document.getElementById('patientName').value||'patient';const date=new Date().toISOString().split('T')[0];a.download='medical_record_'+name+'_'+date+'.pdf';a.click();}
+function downloadPDF(){
+  if(!pdfData){
+    const editedTranscript=document.getElementById('transcriptBox').innerText;
+    fetch('/generate_pdf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({transcript:editedTranscript,patient_name:document.getElementById('patientName').value,patient_dob:document.getElementById('patientDob').value,doctor_name:document.getElementById('doctorName').value,language:document.getElementById('language').value})})
+    .then(r=>r.blob()).then(blob=>{pdfData=URL.createObjectURL(blob);triggerDownload();});
+    return;
+  }
+  triggerDownload();
+}
+function triggerDownload(){const a=document.createElement('a');a.href=pdfData;const name=document.getElementById('patientName').value||'patient';const date=new Date().toISOString().split('T')[0];a.download='medical_record_'+name+'_'+date+'.pdf';a.click();}
 function deleteTranscript(){
   if(confirm('Delete this recording and transcript?')){reset();}
 }
-function reset(){audioBlob=null;pdfData=null;seconds=0;document.getElementById('timer').textContent='00:00';document.getElementById('timer').classList.remove('visible');document.getElementById('recordStatus').textContent='Press button to start recording';document.getElementById('recordStatus').classList.remove('active');document.getElementById('generateBtn').disabled=true;document.getElementById('generateBtn').style.display='flex';document.getElementById('resultSection').classList.remove('visible');document.getElementById('progressSection').classList.remove('visible');hideError();}
+function reset(){audioBlob=null;pdfData=null;seconds=0;document.getElementById('timer').textContent='00:00';document.getElementById('timer').classList.remove('visible');document.getElementById('recordStatus').textContent='Press button to start recording';document.getElementById('recordStatus').classList.remove('active');document.getElementById('generateBtn').disabled=true;document.getElementById('generateBtn').style.display='flex';document.getElementById('resultSection').classList.remove('visible');document.getElementById('progressSection').classList.remove('visible');document.getElementById('transcriptBox').textContent='';hideError();}
 function showError(msg){const el=document.getElementById('errorMsg');el.textContent='⚠️ '+msg;el.classList.add('visible');}
 function hideError(){document.getElementById('errorMsg').classList.remove('visible');}
 </script>
@@ -791,13 +803,13 @@ def pricing():
     user_email = session.get("user_email", "")
     user = redis_get(f"ms:user:{user_email}")
     plan = user.get("plan", "none") if user else "none"
-    return render_template_string(PRICING_HTML, 
+    return render_template_string(PRICING_HTML,
         stripe_public_key=STRIPE_PUBLIC_KEY,
         plan=plan,
         user_email=user_email)
 
 @app.route("/create-checkout-session", methods=["POST"])
-@login_required  
+@login_required
 def create_checkout_session():
     plan = request.json.get("plan", "starter")
     user_email = session.get("user_email", "")

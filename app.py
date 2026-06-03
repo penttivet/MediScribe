@@ -225,7 +225,7 @@ HTML = """<!DOCTYPE html>
   <div class="result-section" id="resultSection">
     <div class="card">
       <div class="card-title">Transcript</div>
-      <div class="transcript-box" id="transcriptBox"></div>
+      <div class="transcript-box" id="transcriptBox" contenteditable="true" spellcheck="false" style="cursor:text:min-height:80px;"></div
     </div>
     <button class="btn download-btn" id="downloadBtn" onclick="downloadPDF()">📥 Download medical record PDF</button>
     <button class="btn btn-secondary" onclick="reset()">🔄 New recording</button>
@@ -264,7 +264,7 @@ async function generate(){
   try{
     const resp=await fetch('/transcribe',{method:'POST',body:formData});const data=await resp.json();if(!resp.ok)throw new Error(data.error||'Transcription failed');
     setStep(1,'done');setStep(2,'active');document.getElementById('transcriptBox').textContent=data.transcript;
-    const resp2=await fetch('/generate_pdf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({transcript:data.transcript,patient_name:document.getElementById('patientName').value,patient_dob:document.getElementById('patientDob').value,doctor_name:document.getElementById('doctorName').value,language:document.getElementById('language').value})});
+    const resp2=await fetch('/generate_pdf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({transcript:document.getElementById('transcriptBox').innerText||data.transcript,:data.transcript,patient_name:document.getElementById('patientName').value,patient_dob:document.getElementById('patientDob').value,doctor_name:document.getElementById('doctorName').value,language:document.getElementById('language').value})});
     if(!resp2.ok){const err=await resp2.json();throw new Error(err.error||'PDF generation failed');}
     setStep(2,'done');setStep(3,'active');const blob=await resp2.blob();pdfData=URL.createObjectURL(blob);setStep(3,'done');
     setTimeout(()=>{document.getElementById('progressSection').classList.remove('visible');document.getElementById('resultSection').classList.add('visible');},600);
